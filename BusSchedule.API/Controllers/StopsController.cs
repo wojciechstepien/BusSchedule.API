@@ -5,7 +5,7 @@ namespace BusSchedule.API.Controllers
 {
     [ApiController]
     [Route("api/stops")]
-    public class StopsController : ControllerBase
+    public class BusStopsController : ControllerBase
     {
         [HttpGet]
         public ActionResult<IEnumerable<StopDto>> GetBusStops()
