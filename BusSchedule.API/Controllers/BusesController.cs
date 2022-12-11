@@ -4,35 +4,41 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BusSchedule.API.Controllers
 {
-    [Route("api/stops/{stopId}/bus")]
+    [Route("api/bus")]
     [ApiController]
     public class BusesController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<IEnumerable<BusDto>> GetStopBuses(int stopId)
+        public ActionResult<IEnumerable<BusDto>> GetBuses()
         {
-            var buses = StopsDataStore.Current.Stops.FirstOrDefault(s => s.Id == stopId);
-            if (buses?.BusList == null)
+            var buses = BusesDataStore.Instance.Buses;
+            if (buses == null)
             {
                 return NotFound();
             }
-            return Ok(buses.BusList);
+            return Ok(buses);
         }
 
-        [HttpGet("{busid}")]
-        public ActionResult<BusDto> GetStopBus(int stopId,int busid)
+        [HttpGet("{busId}")]
+        public ActionResult<BusDto> GetBus(int busId)
         {
-            var buses = StopsDataStore.Current.Stops.FirstOrDefault(s => s.Id == stopId);
-            if (buses?.BusList == null)
+            var bus = BusesDataStore.Instance.Buses.FirstOrDefault(s => s.Id == busId);
+            if (bus == null)
             {
                 return NotFound();
             }
-            var stopbus = buses.BusList.FirstOrDefault(s => s.Id == busid);
-            if (stopbus == null)
+            return Ok(bus);
+        }
+
+        [HttpGet("{busId}/route")]
+        public ActionResult<List<StopDto>> GetBusRoute(int busId)
+        {
+            var bus = BusesDataStore.Instance.Buses.FirstOrDefault(s => s.Id == busId);
+            if (bus?.StopsRoute == null)
             {
                 return NotFound();
             }
-            return Ok(stopbus);
+            return Ok(bus.StopsRoute);
         }
     }
 }

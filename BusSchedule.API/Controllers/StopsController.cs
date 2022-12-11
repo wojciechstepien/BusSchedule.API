@@ -8,16 +8,16 @@ namespace BusSchedule.API.Controllers
     public class StopsController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<IEnumerable<StopDto>> GetBusStops()
+        public ActionResult<IEnumerable<StopDto>> GetStops()
         {
-            return Ok(StopsDataStore.Current.Stops);
+            return Ok(StopsDataStore.Instance.Stops);
         }
 
 
-        [HttpGet("{id}")]
-        public ActionResult<StopDto> GetBusStop(int id)
+        [HttpGet("{stopId}")]
+        public ActionResult<StopDto> GetStop(int stopId) 
         {
-            var stopToReturn = StopsDataStore.Current.Stops.FirstOrDefault(c => c.Id == id);
+            var stopToReturn = StopsDataStore.Instance.Stops.FirstOrDefault(c => c.Id == stopId);
             if (stopToReturn == null)
             {
                 return NotFound();
