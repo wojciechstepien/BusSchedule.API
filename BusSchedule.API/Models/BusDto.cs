@@ -1,4 +1,7 @@
-﻿namespace BusSchedule.API.Models
+﻿using BusSchedule.API.Validation;
+using System.ComponentModel.DataAnnotations;
+
+namespace BusSchedule.API.Models
 {
     public class BusDto
     {
