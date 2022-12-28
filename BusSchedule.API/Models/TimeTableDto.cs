@@ -8,10 +8,8 @@ namespace BusSchedule.API.Models
 {
     public class TimeTableDto
     {
-        public BusDto? Bus { get; set; } = null;
-        public StopDto? Stop { get; set; } = null;
-        //[JsonProperty(ItemConverterType = typeof(TimeOnlyJsonConverter))]
-        [JsonProperty(ItemConverterType = typeof(TimeOnlyJsonConverter))]
+        public BusDto? Bus { get; set; }
+        public StopDto? Stop { get; set; }
         public List<TimeOnly>? Times { get; set; } = null;
     }
 }
