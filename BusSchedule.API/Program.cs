@@ -1,11 +1,9 @@
-using BusSchedule.API.Converters;
 using Microsoft.Extensions.Options;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
 //adding timeonly suport
 builder.Services.AddDateOnlyTimeOnlyStringConverters();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

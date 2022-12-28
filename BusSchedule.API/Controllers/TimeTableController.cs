@@ -71,6 +71,21 @@ namespace BusSchedule.API.Controllers
             if (created) return CreatedAtRoute("GetStopAndBusTimetable", new { busId = busId , stopId = stopId }, timeTable);
             return NotFound("Time already exists");
         }
+        [HttpPut("{busId}/stop/{stopId}")]
+        public ActionResult UpdateTimeTable(int busId,int stopId,TimeTableDto newTimeTable)
+        {
+            var timetable = TimeTablesDataStore.Instance.TimeTables.FirstOrDefault((p) =>
+            {
+                return p.Bus.Id == busId
+                       && p.Stop.Id == stopId;
+            });
+            if (timetable == null) return NotFound();
+            timetable.Stop = newTimeTable.Stop;
+            timetable.Bus = newTimeTable.Bus;
+            timetable.Times.Clear();
+            timetable.Times.AddRange(newTimeTable.Times);
+            return NoContent();
+        }
 
     }
 }

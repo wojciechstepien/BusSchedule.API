@@ -1,5 +1,6 @@
 ﻿using BusSchedule.API.Models;
 using BusSchedule.API.Models.ForCreation;
+using BusSchedule.API.Models.ForUpdate;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,6 +49,19 @@ namespace BusSchedule.API.Controllers
             var newBus = new BusDto { Id = ++maxId, Name = bus.Name, StopsRoute = bus.StopsRoute };
             BusesDataStore.Instance.Buses.Add(newBus);
             return CreatedAtRoute("GetBus", new { busId = maxId }, newBus);
+        }
+        [HttpPut("{busId}")]
+        public ActionResult UpdateStop(int busId, BusForUpdateDto newBus)
+        {
+            var bus = BusesDataStore.Instance.Buses.FirstOrDefault(c => c.Id == busId);
+            if (bus == null) 
+            {
+                return NotFound();
+            }
+            bus.Name = newBus.Name;
+            bus.StopsRoute.Clear();
+            bus.StopsRoute.AddRange(newBus.StopsRoute);
+            return NoContent();
         }
     }
 }

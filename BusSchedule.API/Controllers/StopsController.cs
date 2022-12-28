@@ -1,4 +1,5 @@
 ﻿using BusSchedule.API.Models;
+using BusSchedule.API.Models.ForUpdate;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BusSchedule.API.Controllers
@@ -37,6 +38,17 @@ namespace BusSchedule.API.Controllers
                 return CreatedAtRoute("GetStop",new {stopId = newStop.Id},newStop);
             }
             return NotFound();
+        }
+        [HttpPut("{stopId}")]
+        public ActionResult UpdateStop(int stopId, StopForUpdateDto newStop)
+        {
+            var stop = StopsDataStore.Instance.Stops.FirstOrDefault(c => c.Id == stopId);
+            if (stop == null)
+            {
+                return NotFound();
+            }
+            stop.Name = newStop.Name;
+            return NoContent();
         }
     }
 }
