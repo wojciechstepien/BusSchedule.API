@@ -1,3 +1,5 @@
+using BusSchedule.API.DbContext;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,12 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.UseDateOnlyTimeOnlyStringConverters();
 });
+
+builder.Services.AddDbContext<BusScheduleContext>(
+    dbContextOptions =>
+    {
+        dbContextOptions.UseSqlite("Data Source = BusSchedule.db");
+    });
 
 var app = builder.Build();
 
