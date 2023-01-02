@@ -1,11 +1,12 @@
 using BusSchedule.API.DbContext;
+using BusSchedule.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+builder.Services.AddControllers().AddNewtonsoftJson();
 //adding timeonly suport
 builder.Services.AddDateOnlyTimeOnlyStringConverters();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -16,10 +17,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddDbContext<BusScheduleContext>(
-    dbContextOptions =>
-    {
-        dbContextOptions.UseSqlite("Data Source = BusSchedule.db");
-    });
+    dbContextOptions => dbContextOptions.UseSqlite("Data Source = BusSchedule.db"));
+
+builder.Services.AddScoped<IBusScheduleRepository, BusScheduleRepository>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+    
 
 var app = builder.Build();
 

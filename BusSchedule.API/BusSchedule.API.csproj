@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="2.0.0" />
     <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="7.0.1" />
@@ -18,6 +19,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusSchedule.API.Migrations
 {
     [DbContext(typeof(BusScheduleContext))]
-    [Migration("20221229192203_BusScheduleAddBusRouteFixed")]
-    partial class BusScheduleAddBusRouteFixed
+    [Migration("20230102131944_renewDatabase")]
+    partial class renewDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,7 +22,7 @@ namespace BusSchedule.API.Migrations
 
             modelBuilder.Entity("BusSchedule.API.Entities.Bus", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("BusId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -31,38 +31,30 @@ namespace BusSchedule.API.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("BusId");
 
                     b.ToTable("Buses");
                 });
 
             modelBuilder.Entity("BusSchedule.API.Entities.Route", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("RouteId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BusId")
+                    b.Property<int?>("BusId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("StopId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
+                    b.HasKey("RouteId");
 
                     b.HasIndex("BusId");
-
-                    b.HasIndex("StopId");
 
                     b.ToTable("Routes");
                 });
 
             modelBuilder.Entity("BusSchedule.API.Entities.Stop", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("StopId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -71,27 +63,51 @@ namespace BusSchedule.API.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("StopId");
 
                     b.ToTable("Stops");
                 });
 
-            modelBuilder.Entity("BusSchedule.API.Entities.TimeTable", b =>
+            modelBuilder.Entity("BusSchedule.API.Entities.StopOrder", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("StopOrderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BusId")
+                    b.Property<int>("Order")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("StopId")
+                    b.Property<int?>("RouteId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeOnly>("Time")
+                    b.Property<int?>("StopId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("StopOrderId");
+
+                    b.HasIndex("RouteId");
+
+                    b.HasIndex("StopId");
+
+                    b.ToTable("StopOrders");
+                });
+
+            modelBuilder.Entity("BusSchedule.API.Entities.TimeTable", b =>
+                {
+                    b.Property<int>("TimeTableId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("BusId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("StopId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeOnly?>("Time")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("TimeTableId");
 
                     b.HasIndex("BusId");
 
@@ -104,17 +120,20 @@ namespace BusSchedule.API.Migrations
                 {
                     b.HasOne("BusSchedule.API.Entities.Bus", "Bus")
                         .WithMany()
-                        .HasForeignKey("BusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BusId");
+
+                    b.Navigation("Bus");
+                });
+
+            modelBuilder.Entity("BusSchedule.API.Entities.StopOrder", b =>
+                {
+                    b.HasOne("BusSchedule.API.Entities.Route", null)
+                        .WithMany("stopOrders")
+                        .HasForeignKey("RouteId");
 
                     b.HasOne("BusSchedule.API.Entities.Stop", "Stop")
                         .WithMany()
-                        .HasForeignKey("StopId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bus");
+                        .HasForeignKey("StopId");
 
                     b.Navigation("Stop");
                 });
@@ -123,19 +142,20 @@ namespace BusSchedule.API.Migrations
                 {
                     b.HasOne("BusSchedule.API.Entities.Bus", "Bus")
                         .WithMany()
-                        .HasForeignKey("BusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BusId");
 
                     b.HasOne("BusSchedule.API.Entities.Stop", "Stop")
                         .WithMany()
-                        .HasForeignKey("StopId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StopId");
 
                     b.Navigation("Bus");
 
                     b.Navigation("Stop");
+                });
+
+            modelBuilder.Entity("BusSchedule.API.Entities.Route", b =>
+                {
+                    b.Navigation("stopOrders");
                 });
 #pragma warning restore 612, 618
         }

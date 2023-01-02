@@ -7,7 +7,5 @@ namespace BusSchedule.API.Models
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        [StopsInListExists(ErrorMessage = "Stops didn't exist in the system")]
-        public List<StopDto>? StopsRoute { get; set; } = null;
     }
 }

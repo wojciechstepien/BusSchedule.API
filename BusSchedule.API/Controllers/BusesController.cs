@@ -1,9 +1,8 @@
-﻿using BusSchedule.API.Models;
-using BusSchedule.API.Models.ForCreation;
-using BusSchedule.API.Models.ForUpdate;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using BusSchedule.API.Entities;
+using BusSchedule.API.Models;
+using BusSchedule.API.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace BusSchedule.API.Controllers
 {
@@ -11,23 +10,29 @@ namespace BusSchedule.API.Controllers
     [ApiController]
     public class BusesController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        private readonly IBusScheduleRepository _busScheduleRepository;
         private readonly ILogger<BusesController> _logger;
-        public BusesController(ILogger<BusesController> logger)
+
+        public BusesController(IBusScheduleRepository busScheduleRepository, IMapper mapper, ILogger<BusesController> logger)
         {
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _busScheduleRepository = busScheduleRepository ?? throw new ArgumentNullException(nameof(busScheduleRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
         [HttpGet]
-        public ActionResult<IEnumerable<BusDto>> GetBuses()
+        public async Task<ActionResult<IEnumerable<BusDto>>> GetBuses()
         {
             try
             {
-                var buses = BusesDataStore.Instance.Buses;
-                if (buses == null)
+                var busEntities = await _busScheduleRepository.GetBusesAsync();
+                if (busEntities == null)
                 {
-                    _logger.LogInformation("Buses didn't exists in data store");
+                    _logger.LogInformation("Buses didn't exists in database");
                     return NotFound();
                 }
-                return Ok(buses);
+                return Ok(_mapper.Map<IEnumerable<BusDto>>(busEntities));
             }
             catch (Exception ex)
             {
@@ -36,18 +41,18 @@ namespace BusSchedule.API.Controllers
             }
         }
 
-        [HttpGet("{busId}", Name ="GetBus")]
-        public ActionResult<BusDto> GetBus(int busId)
+        [HttpGet("{busId}", Name = "GetBus")]
+        public async Task<ActionResult<BusDto>> GetBus(int busId)
         {
             try
             {
-                var bus = BusesDataStore.Instance.Buses.FirstOrDefault(s => s.Id == busId);
-                if (bus == null)
+                var busEntity = await _busScheduleRepository.GetBusAsync(busId);
+                if (busEntity == null)
                 {
                     _logger.LogInformation($"Pointed Bus (id: {busId}) does not exist in data store)");
                     return NotFound();
                 }
-                return Ok(bus);
+                return Ok(_mapper.Map<Bus>(busEntity));
             }
             catch (Exception ex)
             {
@@ -56,85 +61,68 @@ namespace BusSchedule.API.Controllers
             }
         }
 
-        [HttpGet("{busId}/route")]
-        public ActionResult<List<StopDto>> GetBusRoute(int busId)
-        {
-            try
-            {
-                var bus = BusesDataStore.Instance.Buses.FirstOrDefault(s => s.Id == busId);
-                if (bus?.StopsRoute == null)
-                {
-                    _logger.LogInformation($"Pointed Bus Route (id: {busId}) does not exist in data store)");
-                    return NotFound();
-                }
-                return Ok(bus.StopsRoute);
-            }
-            catch   (Exception ex) 
-            {
-                _logger.LogCritical($"Exception occured while processing GetBusRoute({busId}", ex);
-                return StatusCode(500, "Problem happend while handling your request.");
-            }
-        }
-        [HttpPost]
-        public ActionResult<BusDto> CreateBus(BusForCreationDto bus) 
-        {
-            try
-            {
-                var maxId = BusesDataStore.Instance.Buses.Max(s => s.Id);
-                var newBus = new BusDto { Id = ++maxId, Name = bus.Name, StopsRoute = bus.StopsRoute };
-                BusesDataStore.Instance.Buses.Add(newBus);
-                _logger.LogInformation("Created new bus");
-                return CreatedAtRoute("GetBus", new { busId = maxId }, newBus);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical($"Exception occured while processing CreateBus", ex);
-                return StatusCode(500, "Problem happend while handling your request.");
-            }
-        }
-        [HttpPut("{busId}")]
-        public ActionResult UpdateStop(int busId, BusForUpdateDto newBus)
-        {
-            try
-            {
-                var bus = BusesDataStore.Instance.Buses.FirstOrDefault(c => c.Id == busId);
-                if (bus == null)
-                {
-                    _logger.LogInformation($"Pointed Bus (id: {busId}) does not exist in data store)");
-                    return NotFound();
-                }
-                bus.Name = newBus.Name;
-                bus.StopsRoute.Clear();
-                bus.StopsRoute.AddRange(newBus.StopsRoute);
-                _logger.LogInformation($"Updated Bus ({busId})");
-                return NoContent();
-            }
-            catch(Exception ex)
-            {
-                _logger.LogCritical($"Exception occured while processing UpdateBus({busId})", ex);
-                return StatusCode(500, "Problem happend while handling your request.");
-            }
-        }
-        [HttpDelete("{busId}")]
-        public ActionResult DeleteBus(int busId) 
-        {
-            try
-            {
-                var bus = BusesDataStore.Instance.Buses.FirstOrDefault(c => c.Id == busId);
-                if (bus == null)
-                {
-                    _logger.LogInformation($"Pointed Bus (id: {busId}) does not exist in data store)");
-                    return NotFound();
-                }
-                BusesDataStore.Instance.Buses.Remove(bus);
-                _logger.LogWarning($"Delete Bus ({busId})");
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical($"Exception occured while processing DeleteBus({busId})", ex);
-                return StatusCode(500, "Problem happend while handling your request.");
-            }
-        }
+        //[HttpPost]
+        //public ActionResult<BusDto> CreateBus(BusForCreationDto bus) 
+        //{
+        //    try
+        //    {
+        //        var maxId = BusesDataStore.Instance.Buses.Max(s => s.Id);
+        //        var newBus = new BusDto { Id = ++maxId, Name = bus.Name, StopsRoute = bus.StopsRoute };
+        //        BusesDataStore.Instance.Buses.Add(newBus);
+        //        _logger.LogInformation("Created new bus");
+        //        return CreatedAtRoute("GetBus", new { busId = maxId }, newBus);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogCritical($"Exception occured while processing CreateBus", ex);
+        //        return StatusCode(500, "Problem happend while handling your request.");
+        //    }
+        //}
+
+        //[HttpPut("{busId}")]
+        //public ActionResult UpdateStop(int busId, BusForUpdateDto newBus)
+        //{
+        //    try
+        //    {
+        //        var bus = BusesDataStore.Instance.Buses.FirstOrDefault(c => c.Id == busId);
+        //        if (bus == null)
+        //        {
+        //            _logger.LogInformation($"Pointed Bus (id: {busId}) does not exist in data store)");
+        //            return NotFound();
+        //        }
+        //        bus.Name = newBus.Name;
+        //        bus.StopsRoute.Clear();
+        //        bus.StopsRoute.AddRange(newBus.StopsRoute);
+        //        _logger.LogInformation($"Updated Bus ({busId})");
+        //        return NoContent();
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        _logger.LogCritical($"Exception occured while processing UpdateBus({busId})", ex);
+        //        return StatusCode(500, "Problem happend while handling your request.");
+        //    }
+        //}
+
+        //[HttpDelete("{busId}")]
+        //public ActionResult DeleteBus(int busId) 
+        //{
+        //    try
+        //    {
+        //        var bus = BusesDataStore.Instance.Buses.FirstOrDefault(c => c.Id == busId);
+        //        if (bus == null)
+        //        {
+        //            _logger.LogInformation($"Pointed Bus (id: {busId}) does not exist in data store)");
+        //            return NotFound();
+        //        }
+        //        BusesDataStore.Instance.Buses.Remove(bus);
+        //        _logger.LogWarning($"Delete Bus ({busId})");
+        //        return NoContent();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogCritical($"Exception occured while processing DeleteBus({busId})", ex);
+        //        return StatusCode(500, "Problem happend while handling your request.");
+        //    }
+        //}
     }
 }

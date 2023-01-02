@@ -39,20 +39,12 @@ namespace BusSchedule.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BusId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("StopId")
+                    b.Property<int?>("BusId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BusId");
-
-                    b.HasIndex("StopId");
 
                     b.ToTable("Routes");
                 });
@@ -73,19 +65,43 @@ namespace BusSchedule.API.Migrations
                     b.ToTable("Stops");
                 });
 
+            modelBuilder.Entity("BusSchedule.API.Entities.StopOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("RouteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("StopId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RouteId");
+
+                    b.HasIndex("StopId");
+
+                    b.ToTable("StopOrders");
+                });
+
             modelBuilder.Entity("BusSchedule.API.Entities.TimeTable", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BusId")
+                    b.Property<int?>("BusId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("StopId")
+                    b.Property<int?>("StopId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeOnly>("Time")
+                    b.Property<TimeOnly?>("Time")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -101,17 +117,20 @@ namespace BusSchedule.API.Migrations
                 {
                     b.HasOne("BusSchedule.API.Entities.Bus", "Bus")
                         .WithMany()
-                        .HasForeignKey("BusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BusId");
+
+                    b.Navigation("Bus");
+                });
+
+            modelBuilder.Entity("BusSchedule.API.Entities.StopOrder", b =>
+                {
+                    b.HasOne("BusSchedule.API.Entities.Route", null)
+                        .WithMany("StopOrders")
+                        .HasForeignKey("RouteId");
 
                     b.HasOne("BusSchedule.API.Entities.Stop", "Stop")
                         .WithMany()
-                        .HasForeignKey("StopId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bus");
+                        .HasForeignKey("StopId");
 
                     b.Navigation("Stop");
                 });
@@ -120,19 +139,20 @@ namespace BusSchedule.API.Migrations
                 {
                     b.HasOne("BusSchedule.API.Entities.Bus", "Bus")
                         .WithMany()
-                        .HasForeignKey("BusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BusId");
 
                     b.HasOne("BusSchedule.API.Entities.Stop", "Stop")
                         .WithMany()
-                        .HasForeignKey("StopId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StopId");
 
                     b.Navigation("Bus");
 
                     b.Navigation("Stop");
+                });
+
+            modelBuilder.Entity("BusSchedule.API.Entities.Route", b =>
+                {
+                    b.Navigation("StopOrders");
                 });
 #pragma warning restore 612, 618
         }
