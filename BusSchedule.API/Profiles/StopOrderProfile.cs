@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusSchedule.API.Models.ForCreation;
 
 namespace BusSchedule.API.Profiles
 {
@@ -7,6 +8,7 @@ namespace BusSchedule.API.Profiles
         public StopOrderProfile()
         {
             CreateMap<Entities.StopOrder, Models.StopOrderDto>();
+            CreateMap<StopOrderForCreationDto, Entities.StopOrder>();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusSchedule.API.Entities;
 using BusSchedule.API.Models;
+using BusSchedule.API.Models.ForCreation;
 using BusSchedule.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,28 +62,23 @@ namespace BusSchedule.API.Controllers
             }
         }
 
-        //[HttpPost]
-        //public ActionResult<StopDto> CreateStop(string Name)
-        //{
-        //    try
-        //    {
-        //        var stops = StopsDataStore.Instance.Stops;
-        //        var stop = StopsDataStore.Instance.Stops.FirstOrDefault(s => s.Name == Name);
-        //        if (stop == null)
-        //        {
-        //            var maxId = StopsDataStore.Instance.Stops.Max(c => c.Id);
-        //            var newStop = new StopDto() { Id = ++maxId, Name = Name };
-        //            stops.Add(newStop);
-        //            _logger.LogInformation($"Created new bus ({newStop.Id})");
-        //            return CreatedAtRoute("GetStop", new { stopId = newStop.Id }, newStop);
-        //        }
-        //        return NotFound();
-        //    } catch(Exception ex)
-        //    {
-        //        _logger.LogCritical($"Exception while creating bus", ex);
-        //        return StatusCode(500, "Problem happend while handling your request.");
-        //    }
-        //}
+        [HttpPost]
+        public async Task<ActionResult<StopDto>> CreateStop(StopForCreationDto stop)
+        {
+            try
+            {
+                var newStop = _mapper.Map<Stop>(stop);
+                await _busScheduleRepository.AddStopAsync(newStop);
+                await _busScheduleRepository.SaveChangesAsync();
+                var createdStop = _mapper.Map<StopDto>(newStop);
+                return CreatedAtRoute("GetStop", new { stopId = createdStop.Id }, createdStop);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"Exception occured while processing CreateStop", ex);
+                return StatusCode(500, "Problem happend while handling your request.");
+            }
+        }
 
         //[HttpPut("{stopId}")]
         //public ActionResult UpdateStop(int stopId, StopForUpdateDto newStop)

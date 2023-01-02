@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusSchedule.API.Entities;
 using BusSchedule.API.Models;
+using BusSchedule.API.Models.ForCreation;
 using BusSchedule.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,23 +62,23 @@ namespace BusSchedule.API.Controllers
             }
         }
 
-        //[HttpPost]
-        //public ActionResult<BusDto> CreateBus(BusForCreationDto bus) 
-        //{
-        //    try
-        //    {
-        //        var maxId = BusesDataStore.Instance.Buses.Max(s => s.Id);
-        //        var newBus = new BusDto { Id = ++maxId, Name = bus.Name, StopsRoute = bus.StopsRoute };
-        //        BusesDataStore.Instance.Buses.Add(newBus);
-        //        _logger.LogInformation("Created new bus");
-        //        return CreatedAtRoute("GetBus", new { busId = maxId }, newBus);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogCritical($"Exception occured while processing CreateBus", ex);
-        //        return StatusCode(500, "Problem happend while handling your request.");
-        //    }
-        //}
+        [HttpPost]
+        public async Task<ActionResult<BusDto>> CreateBus(BusForCreationDto bus)
+        {
+            try
+            {
+                var newBus = _mapper.Map<Bus>(bus);
+                await _busScheduleRepository.AddBusAsync(newBus);
+                await _busScheduleRepository.SaveChangesAsync();
+                var createdBus = _mapper.Map<BusDto>(newBus);
+                return CreatedAtRoute("GetBus", new { busId = createdBus.Id }, createdBus);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"Exception occured while processing CreateBus", ex);
+                return StatusCode(500, "Problem happend while handling your request.");
+            }
+        }
 
         //[HttpPut("{busId}")]
         //public ActionResult UpdateStop(int busId, BusForUpdateDto newBus)

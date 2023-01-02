@@ -1,4 +1,4 @@
-﻿using BusSchedule.API.DbContext.Converters;
+﻿
 using BusSchedule.API.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
