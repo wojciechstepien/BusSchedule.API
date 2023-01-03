@@ -29,7 +29,12 @@ namespace BusSchedule.API.Controllers
         /// <param name="busId">ID of the bus</param>
         /// <param name="stopId">ID of the stop</param>
         /// <returns>Action Result with wraped list of timetablesdto</returns>
+        /// <response code="200">Returns the requested TimeTables</response>
         [HttpGet(Name = "GetBusTimeTablesAtStop")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<TimeTableDto>>> GetBusTimeTablesAtStop(int busId, int stopId)
         {
             try
@@ -61,6 +66,11 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="stopId">Id of the stop of which timetables will be returned</param>
         /// <returns>ActionResult with wraped list of TimeTableDto</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{stopId}", Name = "GetTimeTablesAtStop")]
         public async Task<ActionResult<List<TimeTableDto>>> GetTimeTablesAtStop(int stopId)
         {
@@ -91,6 +101,10 @@ namespace BusSchedule.API.Controllers
         /// <param name="stopId">Id of the stop</param>
         /// <param name="time">time of departure to add</param>
         /// <returns>An ActionResult with wraped newly created timetable</returns>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<ActionResult<TimeTableDto>> CreateTimeTable(int busId, int stopId, TimeOnly time)
         {
@@ -126,6 +140,10 @@ namespace BusSchedule.API.Controllers
         /// <param name="timeTableId">ID of the TimeTable to update</param>
         /// <param name="timeTableForUpdate">TimeTable to update</param>
         /// <returns>ActionResult</returns>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut]
         public async Task<ActionResult> UpdateTime(int timeTableId, TimeTableForUpdateDto timeTableForUpdate)
         {
@@ -143,6 +161,10 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="timeTableId">ID of the timetable to delete</param>
         /// <returns>ActionResult</returns>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete]
         public async Task<ActionResult> DeleteTimeTable(int timeTableId)
         {

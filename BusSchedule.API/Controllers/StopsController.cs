@@ -26,6 +26,11 @@ namespace BusSchedule.API.Controllers
         /// Get All Stops
         /// </summary>
         /// <returns>An ActionResult with wraped IEnumerable of StopDto</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StopDto>>> GetStops()
         {
@@ -50,6 +55,11 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="stopId">ID of the bus to get</param>
         /// <returns>An ActionResult with wraped StopDto</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{stopId}", Name = "GetStop")]
         public async Task<ActionResult<StopDto>> GetStop(int stopId) 
         {
@@ -74,6 +84,11 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="stop">Stop to add</param>
         /// <returns>ActionResult</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<ActionResult<StopDto>> CreateStop(StopForCreationDto stop)
         {
@@ -97,6 +112,11 @@ namespace BusSchedule.API.Controllers
         /// <param name="stopId">ID of the stop to update</param>
         /// <param name="updatedStop">Updated stop</param>
         /// <returns>An ActionResult</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{stopId}")]
         public async Task<ActionResult> UpdateStop(int stopId, StopForUpdateDto updatedStop)
         {
@@ -124,6 +144,11 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="stopId">ID of the stop to delete</param>
         /// <returns>ActionResult</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpDelete]
         public async Task<ActionResult> DeleteStop(int stopId)
         {

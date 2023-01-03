@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BusSchedule.API.Controllers
 {
+
     [Route("api/bus")]
     [ApiController]
     public class BusesController : ControllerBase
@@ -25,7 +26,12 @@ namespace BusSchedule.API.Controllers
         /// <summary>
         /// Get all Buses
         /// </summary>
-        /// <returns>An IActionResult</returns>
+        /// <returns>An ActionResult</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BusDto>>> GetBuses()
         {
@@ -50,6 +56,10 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="busId">Id of the bus that we want to return</param>
         /// <returns>ActionResult with wraped BusDto</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{busId}", Name = "GetBus")]
         public async Task<ActionResult<BusDto>> GetBus(int busId)
         {
@@ -74,6 +84,10 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="bus">Bus to Create</param>
         /// <returns>An ActionResult with wraped created Bus </returns>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<ActionResult<BusDto>> CreateBus(BusForCreationDto bus)
         {
@@ -97,6 +111,11 @@ namespace BusSchedule.API.Controllers
         /// <param name="busId">Id of bus to update</param>
         /// <param name="updatedBus">Bus to Update</param>
         /// <returns></returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("{busId}")]
         public async Task<ActionResult> UpdateBus(int busId, BusForUpdateDto updatedBus)
         {
@@ -124,6 +143,10 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="busId">Id of bus to delete</param>
         /// <returns></returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete]
         public async Task<ActionResult> DeleteBus(int busId)
         {

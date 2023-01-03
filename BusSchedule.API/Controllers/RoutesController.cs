@@ -28,6 +28,11 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="routeId">Id of route to get</param>
         /// <returns>ActionResult with wraped RouteDto</returns>
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{routeId}", Name = "GetRoute")]
         public async Task<ActionResult<RouteDto>> GetRoute(int routeId)
         {
@@ -39,12 +44,12 @@ namespace BusSchedule.API.Controllers
                     _logger.LogInformation($"Routes for pointed bus (id: {routeId}) did not exist in the database.");
                     return NotFound();
                 }
-                return new RouteDto
+                return Ok(new RouteDto
                 {
                     Id = routeEntities.Id,
                     Bus = _mapper.Map<BusDto>(routeEntities.Bus),
                     StopsOrders = _mapper.Map<List<StopOrderDto>>(routeEntities.StopOrders)
-                };
+                });
             }
             catch (Exception ex)
             {
@@ -57,6 +62,11 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="busId">ID of the bus for which route will be created</param>
         /// <returns>An ActionResult with wraped newly created RouteDto </returns>
+
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<ActionResult<RouteDto>> CreateRoute(int busId)
         {
@@ -87,6 +97,11 @@ namespace BusSchedule.API.Controllers
         /// <param name="stopId">ID of the stop that will be added to route</param>
         /// <param name="orderNumber">stop number on the route (order number)</param>
         /// <returns>An ActionResult with wraped RouteDto with stops at this route</returns>
+        
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("{routeId}/StopOrder")]
         public async Task<ActionResult<RouteDto>> CreateStopOrder(int routeId,int stopId, int orderNumber)
         {
@@ -122,6 +137,10 @@ namespace BusSchedule.API.Controllers
         /// <param name="stopOrderId">ID of the route to update</param>
         /// <param name="stopOrder">StopOrderForUpdateDto of updated stop and orders</param>
         /// <returns>An ActionResult</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("{routeId}/StopOrder")]
         public async Task<ActionResult> UpdateStopOrder(int stopOrderId,StopOrderForUpdateDto stopOrder)
         {
@@ -139,6 +158,10 @@ namespace BusSchedule.API.Controllers
         /// </summary>
         /// <param name="routeId">ID of the route to delete</param>
         /// <returns>An ActionResult</returns>
+        /// 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete]
         public async Task<ActionResult> DeleteRoute(int routeId)
         {
