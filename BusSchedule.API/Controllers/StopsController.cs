@@ -2,6 +2,7 @@
 using BusSchedule.API.Entities;
 using BusSchedule.API.Models;
 using BusSchedule.API.Models.ForCreation;
+using BusSchedule.API.Models.ForUpdate;
 using BusSchedule.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,10 @@ namespace BusSchedule.API.Controllers
             _busScheduleRepository = busScheduleRepository ?? throw new ArgumentNullException(nameof(busScheduleRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
+        /// <summary>
+        /// Get All Stops
+        /// </summary>
+        /// <returns>An ActionResult with wraped IEnumerable of StopDto</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StopDto>>> GetStops()
         {
@@ -41,7 +45,11 @@ namespace BusSchedule.API.Controllers
                 return StatusCode(500, "Problem happend while handling your request.");
             }
         }
-
+        /// <summary>
+        /// Get pointed stop 
+        /// </summary>
+        /// <param name="stopId">ID of the bus to get</param>
+        /// <returns>An ActionResult with wraped StopDto</returns>
         [HttpGet("{stopId}", Name = "GetStop")]
         public async Task<ActionResult<StopDto>> GetStop(int stopId) 
         {
@@ -61,7 +69,11 @@ namespace BusSchedule.API.Controllers
                 return StatusCode(500, "Problem happend while handling your request.");
             }
         }
-
+        /// <summary>
+        /// Creates new stop
+        /// </summary>
+        /// <param name="stop">Stop to add</param>
+        /// <returns>ActionResult</returns>
         [HttpPost]
         public async Task<ActionResult<StopDto>> CreateStop(StopForCreationDto stop)
         {
@@ -79,42 +91,54 @@ namespace BusSchedule.API.Controllers
                 return StatusCode(500, "Problem happend while handling your request.");
             }
         }
-
-        //[HttpPut("{stopId}")]
-        //public ActionResult UpdateStop(int stopId, StopForUpdateDto newStop)
-        //{
-        //    try
-        //    {
-        //        var stop = StopsDataStore.Instance.Stops.FirstOrDefault(c => c.Id == stopId);
-        //        if (stop == null)
-        //        {
-        //            return NotFound();
-        //        }
-        //        stop.Name = newStop.Name;
-        //        return NoContent();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogCritical($"Exception while updating bus ({stopId})", ex);
-        //        return StatusCode(500, "Problem happend while handling your request.");
-        //    }
-        //}
-
-        //[HttpDelete("{stopId}")]
-        //public ActionResult DeleteStop(int stopId)
-        //{
-        //    try
-        //    {
-        //        var stop = StopsDataStore.Instance.Stops.FirstOrDefault(c => c.Id == stopId);
-        //        if (stop == null) return NotFound();
-        //        StopsDataStore.Instance.Stops.Remove(stop);
-        //        return NoContent();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogCritical($"Exception while deleting bus ({stopId})", ex);
-        //        return StatusCode(500, "Problem happend while handling your request.");
-        //    }
-        //}
+        /// <summary>
+        /// Updates pointed stop
+        /// </summary>
+        /// <param name="stopId">ID of the stop to update</param>
+        /// <param name="updatedStop">Updated stop</param>
+        /// <returns>An ActionResult</returns>
+        [HttpPut("{stopId}")]
+        public async Task<ActionResult> UpdateStop(int stopId, StopForUpdateDto updatedStop)
+        {
+            try
+            {
+                if (!await _busScheduleRepository.StopExists(stopId))
+                {
+                    _logger.LogInformation($"Pointed Stop (id: {stopId}) does not exist in data store)");
+                    return NotFound();
+                }
+                var stopEntity = await _busScheduleRepository.GetStopAsync(stopId);
+                _mapper.Map(updatedStop, stopEntity);
+                await _busScheduleRepository.SaveChangesAsync();
+                _logger.LogInformation($"Updated stop ({stopId})");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"Exception occured while processing UpdateStop({stopId})", ex);
+                return StatusCode(500, "Problem happend while handling your request.");
+            }
+        }
+        /// <summary>
+        /// Deletes pointed Stop
+        /// </summary>
+        /// <param name="stopId">ID of the stop to delete</param>
+        /// <returns>ActionResult</returns>
+        [HttpDelete]
+        public async Task<ActionResult> DeleteStop(int stopId)
+        {
+            if (!await _busScheduleRepository.StopExists(stopId))
+            {
+                return NotFound();
+            }
+            var stopToDelete = await _busScheduleRepository.GetStopAsync(stopId);
+            if (stopToDelete == null)
+            {
+                return NotFound();
+            }
+            _busScheduleRepository.DeleteStop(stopToDelete);
+            await _busScheduleRepository.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

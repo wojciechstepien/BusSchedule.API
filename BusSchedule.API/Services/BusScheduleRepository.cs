@@ -1,6 +1,7 @@
 ﻿using BusSchedule.API.DbContext;
 using BusSchedule.API.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace BusSchedule.API.Services
 {
@@ -113,6 +114,45 @@ namespace BusSchedule.API.Services
             .OrderBy(p => p.Time)
             .ToListAsync();
         }
-        
+
+        public async Task<bool> StopOrderExists(int stopOrderId)
+        {
+            return await _context.StopOrders.AnyAsync(c => c.Id == stopOrderId);
+        }
+
+        public async Task<StopOrder?> GetStopOrderAsync(int stopOrderId)
+        {
+            return await _context.StopOrders.FirstOrDefaultAsync(c => c.Id == stopOrderId);
+        }
+
+        public async Task<bool> TimeTableExists(int timeTableId)
+        {
+            return await _context.TimeTables.AnyAsync(c => c.Id == timeTableId);
+        }
+
+        public async Task<TimeTable?> GetTimeTableAsync(int timeTableId)
+        {
+            return await _context.TimeTables.FirstOrDefaultAsync(c => c.Id == timeTableId);
+        }
+
+        public void DeleteTimeTable(TimeTable timeTableToDelete)
+        {
+            _context.TimeTables.Remove(timeTableToDelete);
+        }
+
+        public void DeleteBus(Bus busToDelete)
+        {
+            _context.Buses.Remove(busToDelete);
+        }
+
+        public void DeleteStop(Stop stopToDelete)
+        {
+            _context.Stops.Remove(stopToDelete);
+        }
+
+        public void DeleteRoute(Entities.Route routeToDelete)
+        {
+            _context.Routes.Remove(routeToDelete);
+        }
     }
 }

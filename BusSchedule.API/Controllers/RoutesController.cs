@@ -2,6 +2,7 @@
 using BusSchedule.API.Entities;
 using BusSchedule.API.Models;
 using BusSchedule.API.Models.ForCreation;
+using BusSchedule.API.Models.ForUpdate;
 using BusSchedule.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -22,7 +23,11 @@ namespace BusSchedule.API.Controllers
             _busScheduleRepository = busScheduleRepository ?? throw new ArgumentNullException(nameof(busScheduleRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
+        /// <summary>
+        /// Get pointed route of bus
+        /// </summary>
+        /// <param name="routeId">Id of route to get</param>
+        /// <returns>ActionResult with wraped RouteDto</returns>
         [HttpGet("{routeId}", Name = "GetRoute")]
         public async Task<ActionResult<RouteDto>> GetRoute(int routeId)
         {
@@ -47,7 +52,11 @@ namespace BusSchedule.API.Controllers
                 return StatusCode(500, "Problem happend while handling your request.");
             }
         }
-
+        /// <summary>
+        /// Creates route for pointed bus
+        /// </summary>
+        /// <param name="busId">ID of the bus for which route will be created</param>
+        /// <returns>An ActionResult with wraped newly created RouteDto </returns>
         [HttpPost]
         public async Task<ActionResult<RouteDto>> CreateRoute(int busId)
         {
@@ -71,7 +80,13 @@ namespace BusSchedule.API.Controllers
                 return StatusCode(500, "Problem happend while handling your request.");
             }
         }
-
+        /// <summary>
+        /// Adds Stop at pointed route and it's number order at this route
+        /// </summary>
+        /// <param name="routeId">ID of the route for which new stop and it's number order will be added</param>
+        /// <param name="stopId">ID of the stop that will be added to route</param>
+        /// <param name="orderNumber">stop number on the route (order number)</param>
+        /// <returns>An ActionResult with wraped RouteDto with stops at this route</returns>
         [HttpPost("{routeId}/StopOrder")]
         public async Task<ActionResult<RouteDto>> CreateStopOrder(int routeId,int stopId, int orderNumber)
         {
@@ -100,6 +115,45 @@ namespace BusSchedule.API.Controllers
                 _logger.LogCritical($"Exception occured while processing CreateStopOrder", ex);
                 return StatusCode(500, "Problem happend while handling your request.");
             }
+        }
+        /// <summary>
+        /// Allows to Update stop and it's order of the route
+        /// </summary>
+        /// <param name="stopOrderId">ID of the route to update</param>
+        /// <param name="stopOrder">StopOrderForUpdateDto of updated stop and orders</param>
+        /// <returns>An ActionResult</returns>
+        [HttpPut("{routeId}/StopOrder")]
+        public async Task<ActionResult> UpdateStopOrder(int stopOrderId,StopOrderForUpdateDto stopOrder)
+        {
+            if(!await _busScheduleRepository.StopOrderExists(stopOrderId))
+            {
+                return NotFound();
+            }
+            var stopOrderEntity = await _busScheduleRepository.GetStopOrderAsync(stopOrderId);
+            _mapper.Map(stopOrder,stopOrderEntity);
+            await _busScheduleRepository.SaveChangesAsync();
+            return NoContent();
+        }
+        /// <summary>
+        /// Deletes pointed route
+        /// </summary>
+        /// <param name="routeId">ID of the route to delete</param>
+        /// <returns>An ActionResult</returns>
+        [HttpDelete]
+        public async Task<ActionResult> DeleteRoute(int routeId)
+        {
+            if (!await _busScheduleRepository.RouteExists(routeId))
+            {
+                return NotFound();
+            }
+            var routeToDelete = await _busScheduleRepository.GetRouteAsync(routeId);
+            if (routeToDelete == null)
+            {
+                return NotFound();
+            }
+            _busScheduleRepository.DeleteRoute(routeToDelete);
+            await _busScheduleRepository.SaveChangesAsync();
+            return NoContent();
         }
     }
 }

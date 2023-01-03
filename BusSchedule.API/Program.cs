@@ -2,6 +2,8 @@ using BusSchedule.API.DbContext;
 using BusSchedule.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,6 +16,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.UseDateOnlyTimeOnlyStringConverters();
+    var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlCommentsFullPatch = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+
+    c.IncludeXmlComments(xmlCommentsFullPatch);
 });
 
 builder.Services.AddDbContext<BusScheduleContext>(

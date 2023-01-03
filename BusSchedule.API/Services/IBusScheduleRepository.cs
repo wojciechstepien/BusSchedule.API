@@ -9,6 +9,8 @@ namespace BusSchedule.API.Services
         Task<Stop?> GetStopAsync(int stopId);
         Task<IEnumerable<Stop>> GetStopsAsync();
         Task<Entities.Route?> GetRouteAsync(int busId);
+        Task<StopOrder?> GetStopOrderAsync(int stopOrderId);
+        Task<TimeTable?> GetTimeTableAsync(int timeTableId);
         Task<IEnumerable<TimeTable?>> GetBusTimetableAtStopAsync(int busId, int stopId);
         Task<IEnumerable<TimeTable?>> GetTimetableAtStopAsync(int stopId);
         Task AddBusAsync(Bus bus);
@@ -20,5 +22,11 @@ namespace BusSchedule.API.Services
         Task<bool> RouteExists(int routeId);
         Task<bool> BusExists(int busId);
         Task<bool> StopExists(int stopId);
+        Task<bool> StopOrderExists(int stopOrderId);
+        Task<bool> TimeTableExists(int timeTableId);
+        void DeleteTimeTable(TimeTable timeTableToDelete);
+        void DeleteBus(Bus busToDelete);
+        void DeleteStop(Stop stopToDelete);
+        void DeleteRoute(Entities.Route routeToDelete);
     }
 }

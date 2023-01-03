@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BusSchedule.API</name>
+    </assembly>
+    <members>
+        <member name="M:BusSchedule.API.Controllers.BusesController.GetBuses">
+            <summary>
+            Get all Buses
+            </summary>
+            <returns>An IActionResult</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.BusesController.GetBus(System.Int32)">
+            <summary>
+            Get bus of pointed id
+            </summary>
+            <param name="busId">Id of the bus that we want to return</param>
+            <returns>ActionResult with wraped BusDto</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.BusesController.CreateBus(BusSchedule.API.Models.ForCreation.BusForCreationDto)">
+            <summary>
+            Creates new bus
+            </summary>
+            <param name="bus">Bus to Create</param>
+            <returns>An ActionResult with wraped created Bus </returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.BusesController.UpdateBus(System.Int32,BusSchedule.API.Models.ForUpdate.BusForUpdateDto)">
+            <summary>
+            Updates already existed bus
+            </summary>
+            <param name="busId">Id of bus to update</param>
+            <param name="updatedBus">Bus to Update</param>
+            <returns></returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.BusesController.DeleteBus(System.Int32)">
+            <summary>
+            Deletes pointed Bus
+            </summary>
+            <param name="busId">Id of bus to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.RoutesController.GetRoute(System.Int32)">
+            <summary>
+            Get pointed route of bus
+            </summary>
+            <param name="routeId">Id of route to get</param>
+            <returns>ActionResult with wraped RouteDto</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.RoutesController.CreateRoute(System.Int32)">
+            <summary>
+            Creates route for pointed bus
+            </summary>
+            <param name="busId">ID of the bus for which route will be created</param>
+            <returns>An ActionResult with wraped newly created RouteDto </returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.RoutesController.CreateStopOrder(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Adds Stop at pointed route and it's number order at this route
+            </summary>
+            <param name="routeId">ID of the route for which new stop and it's number order will be added</param>
+            <param name="stopId">ID of the stop that will be added to route</param>
+            <param name="orderNumber">stop number on the route (order number)</param>
+            <returns>An ActionResult with wraped RouteDto with stops at this route</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.RoutesController.UpdateStopOrder(System.Int32,BusSchedule.API.Models.ForUpdate.StopOrderForUpdateDto)">
+            <summary>
+            Allows to Update stop and it's order of the route
+            </summary>
+            <param name="stopOrderId">ID of the route to update</param>
+            <param name="stopOrder">StopOrderForUpdateDto of updated stop and orders</param>
+            <returns>An ActionResult</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.RoutesController.DeleteRoute(System.Int32)">
+            <summary>
+            Deletes pointed route
+            </summary>
+            <param name="routeId">ID of the route to delete</param>
+            <returns>An ActionResult</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.StopsController.GetStops">
+            <summary>
+            Get All Stops
+            </summary>
+            <returns>An ActionResult with wraped IEnumerable of StopDto</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.StopsController.GetStop(System.Int32)">
+            <summary>
+            Get pointed stop 
+            </summary>
+            <param name="stopId">ID of the bus to get</param>
+            <returns>An ActionResult with wraped StopDto</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.StopsController.CreateStop(BusSchedule.API.Models.ForCreation.StopForCreationDto)">
+            <summary>
+            Creates new stop
+            </summary>
+            <param name="stop">Stop to add</param>
+            <returns>ActionResult</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.StopsController.UpdateStop(System.Int32,BusSchedule.API.Models.ForUpdate.StopForUpdateDto)">
+            <summary>
+            Updates pointed stop
+            </summary>
+            <param name="stopId">ID of the stop to update</param>
+            <param name="updatedStop">Updated stop</param>
+            <returns>An ActionResult</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.StopsController.DeleteStop(System.Int32)">
+            <summary>
+            Deletes pointed Stop
+            </summary>
+            <param name="stopId">ID of the stop to delete</param>
+            <returns>ActionResult</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.TimeTableController.GetBusTimeTablesAtStop(System.Int32,System.Int32)">
+            <summary>
+            Gets departure times of the pointed bus at pointed stop
+            </summary>
+            <param name="busId">ID of the bus</param>
+            <param name="stopId">ID of the stop</param>
+            <returns>Action Result with wraped list of timetablesdto</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.TimeTableController.GetTimeTablesAtStop(System.Int32)">
+            <summary>
+            Gets all bus departure times at pointed stop
+            </summary>
+            <param name="stopId">Id of the stop of which timetables will be returned</param>
+            <returns>ActionResult with wraped list of TimeTableDto</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.TimeTableController.CreateTimeTable(System.Int32,System.Int32,System.TimeOnly)">
+            <summary>
+            Adds departure time of pointed bus at pointed stop
+            </summary>
+            <param name="busId">Id of the bus</param>
+            <param name="stopId">Id of the stop</param>
+            <param name="time">time of departure to add</param>
+            <returns>An ActionResult with wraped newly created timetable</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.TimeTableController.UpdateTime(System.Int32,BusSchedule.API.Models.ForUpdate.TimeTableForUpdateDto)">
+            <summary>
+            Updates timetable
+            </summary>
+            <param name="timeTableId">ID of the TimeTable to update</param>
+            <param name="timeTableForUpdate">TimeTable to update</param>
+            <returns>ActionResult</returns>
+        </member>
+        <member name="M:BusSchedule.API.Controllers.TimeTableController.DeleteTimeTable(System.Int32)">
+            <summary>
+            Deletes pointed timetable
+            </summary>
+            <param name="timeTableId">ID of the timetable to delete</param>
+            <returns>ActionResult</returns>
+        </member>
+        <member name="T:BusSchedule.API.Migrations.renewDatabase">
+            <inheritdoc />
+        </member>
+        <member name="M:BusSchedule.API.Migrations.renewDatabase.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:BusSchedule.API.Migrations.renewDatabase.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:BusSchedule.API.Migrations.renewDatabase.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:BusSchedule.API.Migrations.changedentitiesnames">
+            <inheritdoc />
+        </member>
+        <member name="M:BusSchedule.API.Migrations.changedentitiesnames.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:BusSchedule.API.Migrations.changedentitiesnames.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:BusSchedule.API.Migrations.changedentitiesnames.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
