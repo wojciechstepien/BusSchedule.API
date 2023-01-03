@@ -49,7 +49,7 @@ namespace BusSchedule.API.Services
             return await _context.Buses.FirstOrDefaultAsync(c => c.Id == busId);
         }
         
-        public async Task<IEnumerable<TimeTable?>> GetBusAtStopTimetableAsync(int busId, int stopId)
+        public async Task<IEnumerable<TimeTable?>> GetBusTimetableAtStopAsync(int busId, int stopId)
         {
             return await _context.TimeTables.Include(p => p.Stop).Include(p => p.Bus)
                 .Where(p => (p.Bus.Id == busId) && (p.Stop.Id == stopId))
@@ -62,7 +62,7 @@ namespace BusSchedule.API.Services
             return await _context.Buses.ToListAsync();
         }
 
-        public async Task<Entities.Route?> GetBusRouteAsync(int routeId)
+        public async Task<Entities.Route?> GetRouteAsync(int routeId)
         {
             return await _context.Routes
                 .Include(p => p.Bus)
@@ -95,14 +95,9 @@ namespace BusSchedule.API.Services
             return (await _context.SaveChangesAsync() >= 1);
         }
 
-        public async Task AddStopOrder(int routeId,int stopId, int orderNumber)
-        {
-            
-        }
-
         public async Task AddStopOrder(int routeId,StopOrder stopOrder)
         {
-            var routes = _context.Routes.FirstOrDefault(c => c.Id == routeId);
+            var routes = await _context.Routes.FirstOrDefaultAsync(c => c.Id == routeId);
             routes.StopOrders.Add(stopOrder);
         }
 
@@ -110,5 +105,14 @@ namespace BusSchedule.API.Services
         {
             return (await _context.Stops.AnyAsync(c => c.Id == stopId));
         }
+
+        public async Task<IEnumerable<TimeTable?>> GetTimetableAtStopAsync(int stopId)
+        {
+            return await _context.TimeTables.Include(p => p.Stop).Include(p => p.Bus)
+            .Where(p => p.Stop.Id == stopId)
+            .OrderBy(p => p.Time)
+            .ToListAsync();
+        }
+        
     }
 }

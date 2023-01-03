@@ -8,11 +8,9 @@ namespace BusSchedule.API.Models
 {
     public class TimeTableDto
     {
-        [Required]
+        public int Id { get; set; }
         public BusDto? Bus { get; set; }
-        [Required]
-        [StopExists(ErrorMessage = "That stop doesn't exist in the system")]
         public StopDto? Stop { get; set; }
-        public List<TimeOnly>? Times { get; set; } = null;
+        public TimeOnly Time { get; set; }
     }
 }

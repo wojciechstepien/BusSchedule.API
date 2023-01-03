@@ -8,8 +8,9 @@ namespace BusSchedule.API.Services
         Task<IEnumerable<Bus>> GetBusesAsync();
         Task<Stop?> GetStopAsync(int stopId);
         Task<IEnumerable<Stop>> GetStopsAsync();
-        Task<Entities.Route?> GetBusRouteAsync(int busId);
-        Task<IEnumerable<TimeTable?>> GetBusAtStopTimetableAsync(int busId, int stopId);
+        Task<Entities.Route?> GetRouteAsync(int busId);
+        Task<IEnumerable<TimeTable?>> GetBusTimetableAtStopAsync(int busId, int stopId);
+        Task<IEnumerable<TimeTable?>> GetTimetableAtStopAsync(int stopId);
         Task AddBusAsync(Bus bus);
         Task AddStopAsync(Stop stop);
         Task AddRouteAsync(Entities.Route route);

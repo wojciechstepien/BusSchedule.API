@@ -28,7 +28,7 @@ namespace BusSchedule.API.Controllers
         {
             try
             {
-                var routeEntities = await _busScheduleRepository.GetBusRouteAsync(routeId);
+                var routeEntities = await _busScheduleRepository.GetRouteAsync(routeId);
                 if (routeEntities == null)
                 {
                     _logger.LogInformation($"Routes for pointed bus (id: {routeId}) did not exist in the database.");
@@ -79,11 +79,11 @@ namespace BusSchedule.API.Controllers
             {
                 if (!await _busScheduleRepository.RouteExists(routeId))
                 {
-                    return NotFound();
+                    return NotFound($"Route (id: {routeId}) does not exist.");
                 }
                 if (!await _busScheduleRepository.StopExists(stopId))
                 {
-                    return NotFound();
+                    return NotFound($"Stop (id: {stopId}) does not exist.");
                 }
                 var newStopOrder = new StopOrder
                 {
@@ -92,7 +92,8 @@ namespace BusSchedule.API.Controllers
                 };
                 await _busScheduleRepository.AddStopOrder(routeId,newStopOrder);
                 await _busScheduleRepository.SaveChangesAsync();
-                return CreatedAtRoute("GetRoute", new { routeId = routeId });
+                return CreatedAtRoute("GetRoute", new { routeId = routeId }, 
+                    await _busScheduleRepository.GetRouteAsync(routeId));
             }
             catch (Exception ex)
             {

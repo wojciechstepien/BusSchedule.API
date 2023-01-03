@@ -1,5 +1,8 @@
-﻿using BusSchedule.API.Models;
+﻿using AutoMapper;
+using BusSchedule.API.Entities;
+using BusSchedule.API.Models;
 using BusSchedule.API.Models.ForCreation;
+using BusSchedule.API.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,167 +13,92 @@ namespace BusSchedule.API.Controllers
     [Route("api/timetable")]
     public class TimeTableController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        private readonly IBusScheduleRepository _busScheduleRepository;
         private readonly ILogger<TimeTableController> _logger;
-        public TimeTableController(ILogger<TimeTableController> logger)
+        public TimeTableController(ILogger<TimeTableController> logger, IBusScheduleRepository busScheduleRepository, IMapper mapper)
         { 
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _busScheduleRepository= busScheduleRepository ?? throw new ArgumentNullException(nameof(busScheduleRepository));
         }
-        // TODO: is the return result okay or should I return whole TimeTableDto?
-        [HttpGet("{busId}")]
-        public ActionResult<List<TimeTableDto>> GetBusTimeTables(int busId)
+
+        [HttpGet(Name = "GetBusTimeTablesAtStop")]
+        public async Task<ActionResult<List<TimeTableDto>>> GetBusTimeTablesAtStop(int busId,int stopId)
         {
             try
             {
-                var timeTable = TimeTablesDataStore.Instance.TimeTables.FindAll(d => d.Bus.Id == busId);
-                if (timeTable == null)
+                if (!await _busScheduleRepository.BusExists(busId))
+                {
+                    return NotFound($"Bus (id: {busId}) does not exist.");
+                }
+                if(!await _busScheduleRepository.StopExists(stopId))
+                {
+                    return NotFound($"Stop (id: {stopId}) does not exist.");
+                }
+                var timetableEntitites = await _busScheduleRepository.GetBusTimetableAtStopAsync(busId, stopId);
+                if(timetableEntitites == null )
                 {
                     return NotFound();
                 }
-                return Ok(timeTable);
+                return Ok(_mapper.Map<IEnumerable<TimeTableDto>>(timetableEntitites));
+
             }
             catch(Exception ex)
             {
-                _logger.LogCritical($"Exception while getting bus timetables ({busId})", ex);
+                _logger.LogCritical($"Exception while getting bus ({busId}) timetables at stop ({stopId})", ex);
                 return StatusCode(500, "Problem happend while handling your request.");
             }
-
         }
-        [HttpGet("{busId}/stop/{stopId}", Name = "GetStopAndBusTimetable")]
-        public ActionResult<TimeTableDto> GetStopAndBusTimetable(int busId,int stopId)
+        [HttpGet("{stopId}", Name = "GetTimeTablesAtStop")]
+        public async Task<ActionResult<List<TimeTableDto>>> GetTimeTablesAtStop( int stopId)
         {
             try
             {
-                var timeTable = TimeTablesDataStore.Instance.TimeTables.FirstOrDefault((p) =>
+                if (!await _busScheduleRepository.StopExists(stopId))
                 {
-                    return p.Bus.Id == busId
-                           && p.Stop.Id == stopId;
-                });
-
-                if (timeTable == null)
+                    return NotFound($"Stop (id: {stopId}) does not exist.");
+                }
+                var timetableEntitites = await _busScheduleRepository.GetTimetableAtStopAsync(stopId);
+                if (timetableEntitites == null)
                 {
                     return NotFound();
                 }
-                return Ok(timeTable);
+                return Ok(_mapper.Map<IEnumerable<TimeTableDto>>(timetableEntitites));
+
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"Exception while getting timetable (stopid: {stopId},busid: {busId})", ex);
+                _logger.LogCritical($"Exception while getting timetables at stop ({stopId})", ex);
                 return StatusCode(500, "Problem happend while handling your request.");
             }
         }
-
-        [HttpGet("stop/{stopId}")]
-        public ActionResult<List<TimeTableDto>> GetAllStopTimeTables(int stopId)
+        [HttpPost]
+        public async Task<ActionResult<TimeTableDto>> CreateTimeTable(int busId,int stopId, TimeOnly time)
         {
             try
             {
-                var timeTable = TimeTablesDataStore.Instance.TimeTables.FindAll(c => c.Stop.Id == stopId);
-                if (timeTable == null)
+                if (!await _busScheduleRepository.BusExists(busId))
                 {
-                    return NotFound();
+                    return NotFound($"Bus (id: {busId}) does not exist.");
                 }
-                return Ok(timeTable);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical($"Exception while stop timetables ({stopId})", ex);
-                return StatusCode(500, "Problem happend while handling your request.");
-            }
-        }
-
-        [HttpPost("{busId}/stop/{stopId}")]
-        public ActionResult<TimeTableDto> AddTimetablesToBus(int busId, int stopId, List<TimeOnly> timeOnlys)
-        {
-            try
-            {
-                var timeTable = TimeTablesDataStore.Instance.TimeTables.FirstOrDefault((p) =>
+                if (!await _busScheduleRepository.StopExists(stopId))
                 {
-                    return p.Bus.Id == busId
-                           && p.Stop.Id == stopId;
-                });
-                if (timeTable == null)
-                {
-                    return NotFound("Not found Timetable for pointed busId and stopId");
+                    return NotFound($"Stop (id: {stopId}) does not exist.");
                 }
-                var created = false;
-                foreach (var timeOnly in timeOnlys)
+                var timeTableToAdd = new TimeTable
                 {
-                    if (!timeTable.Times.Contains(timeOnly))
-                    {
-                        timeTable.Times.Add(timeOnly);
-                        created = true;
-                    }
-                }
-                if (created) return CreatedAtRoute("GetStopAndBusTimetable", new { busId = busId, stopId = stopId }, timeTable);
-                return NotFound("Time already exists");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical($"Exception while adding timetables to bus ({busId}) at stop ({stopId}) ", ex);
-                return StatusCode(500, "Problem happend while handling your request.");
-            }
-        }
-
-        [HttpPut("{busId}/stop/{stopId}")]
-        public ActionResult UpdateTimeTable(int busId,int stopId,TimeTableDto newTimeTable)
-        {
-            try
-            {
-                var timetable = TimeTablesDataStore.Instance.TimeTables.FirstOrDefault((p) =>
-                {
-                    return p.Bus.Id == busId
-                           && p.Stop.Id == stopId;
-                });
-                if (timetable == null) return NotFound();
-                timetable.Stop = newTimeTable.Stop;
-                timetable.Bus = newTimeTable.Bus;
-                timetable.Times.Clear();
-                timetable.Times.AddRange(newTimeTable.Times);
-                return NoContent();
-            }
-            catch(Exception ex)
-            {
-                _logger.LogCritical($"Exception while updating bus ({busId}) at stop ({stopId})", ex);
-                return StatusCode(500, "Problem happend while handling your request.");
-            }
-        }
-
-        [HttpPatch("{busId}/stop/{stopId}")]
-        public ActionResult PartiallyUpdateTimeTable(int busId,int stopId,JsonPatchDocument<TimeTableDto> patchDocument) 
-        {
-            try
-            {
-                var timetable = TimeTablesDataStore.Instance.TimeTables.FirstOrDefault((p) =>
-                {
-                    return p.Bus.Id == busId
-                           && p.Stop.Id == stopId;
-                });
-                if (timetable == null) return NotFound();
-                var timeTableToPatch = new TimeTableDto
-                {
-                    Bus = timetable.Bus,
-                    Stop = timetable.Stop,
-                    Times = timetable.Times
+                    Bus = await _busScheduleRepository.GetBusAsync(busId),
+                    Stop = await _busScheduleRepository.GetStopAsync(stopId),
+                    Time = time
                 };
-                patchDocument.ApplyTo(timeTableToPatch, ModelState);
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
-                if (!TryValidateModel(timeTableToPatch))
-                {
-                    return BadRequest();
-                }
-                timetable.Bus = timeTableToPatch.Bus;
-                timetable.Stop = timeTableToPatch.Stop;
-                timetable.Times = timeTableToPatch.Times;
-
-                return NoContent();
+                await _busScheduleRepository.AddTimeTable(timeTableToAdd);
+                await _busScheduleRepository.SaveChangesAsync();
+                return CreatedAtRoute("GetBusTimeTablesAtStop", new { busId = busId, stopId = stopId }, _mapper.Map<TimeTableDto>(timeTableToAdd));
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"Exception while partially updating bus ({busId}) timetable at stop({stopId})", ex);
+                _logger.LogCritical($"Exception occured while creating timetable for bus ({busId}) at stop ({stopId})", ex);
                 return StatusCode(500, "Problem happend while handling your request.");
             }
         }
