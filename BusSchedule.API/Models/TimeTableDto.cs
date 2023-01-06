@@ -1,5 +1,4 @@
 ﻿using BusSchedule.API.Models.ForUpdate;
-using BusSchedule.API.Validation;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;

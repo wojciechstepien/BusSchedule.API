@@ -1,5 +1,4 @@
 ﻿using BusSchedule.API.Models;
-using BusSchedule.API.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

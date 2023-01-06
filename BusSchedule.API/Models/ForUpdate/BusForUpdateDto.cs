@@ -1,6 +1,4 @@
-﻿using BusSchedule.API.Validation;
-
-namespace BusSchedule.API.Models.ForUpdate
+﻿namespace BusSchedule.API.Models.ForUpdate
 {
     public class BusForUpdateDto
     {
